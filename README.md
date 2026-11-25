@@ -1,6 +1,6 @@
 # mcp-groundtruth
 
-[![CI](https://github.com/shreyasbhakta/mcp-groundtruth/actions/workflows/ci.yml/badge.svg)](https://github.com/shreyasbhakta/mcp-groundtruth/actions/workflows/ci.yml)
+[![CI](https://github.com/vayrik-labs/mcp-groundtruth/actions/workflows/ci.yml/badge.svg)](https://github.com/vayrik-labs/mcp-groundtruth/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/python-3.11%20%7C%203.14-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
@@ -13,10 +13,25 @@ unless they come from trusted servers [1]. mcp-groundtruth runs the tools
 against observable state and checks whether what a tool declares matches
 what it does.
 
-> **Scope of release 0.1.** This release tests only the fixture servers in
-> this repository, each built with a known expected outcome, to show the
-> harness produces correct verdicts. It does not test any third-party MCP
-> server and makes no claims about the MCP ecosystem.
+A false hint matters because some agent clients use these hints to decide
+what runs without asking the user. A tool that claims to be read-only, or
+safe to repeat, gets less scrutiny than one that doesn't.
+
+Try it in one line, with nothing to set up:
+
+```bash
+uvx --from mcp-groundtruth mcpgt demo
+```
+
+It runs a bundled server that declares `idempotentHint: true`. Sequential
+calls agree, but concurrent calls create duplicates, and the harness shows
+the VIOLATION with its evidence.
+
+The first real result: auditing the reference memory server found three
+tools whose hints undersold them (`idempotentHint: false` on tools that
+behave idempotently). They were fixed upstream in
+[modelcontextprotocol/servers#5349](https://github.com/modelcontextprotocol/servers/pull/5349).
+See [Audit results](#audit-results).
 
 ---
 
@@ -150,7 +165,7 @@ Each verdict has one primary reason and may list secondary reasons, so a
 `CALL_ERROR` stays visible under `NO_DECLARATION`. The concurrent test is
 one-sided. A single diverging attempt is a conclusive VIOLATION. A PASS only
 means no race was observed. The full rules are in
-[docs/methodology.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/methodology.md).
+[docs/methodology.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/methodology.md).
 
 ---
 
@@ -165,14 +180,14 @@ pip install mcp-groundtruth                # install from PyPI
 uvx --from mcp-groundtruth mcpgt --help    # or run it without installing
 ```
 
-To test your own server, follow [Test your own MCP server](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/your-server.md),
+To test your own server, follow [Test your own MCP server](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/your-server.md),
 which walks a small example server from `mcpgt init` to a report and shows
 how to gate CI on it with this repository's GitHub Action.
 To run this repository's fixtures, use a checkout and
 [uv](https://docs.astral.sh/uv/):
 
 ```bash
-git clone https://github.com/shreyasbhakta/mcp-groundtruth.git
+git clone https://github.com/vayrik-labs/mcp-groundtruth.git
 cd mcp-groundtruth
 uv sync
 uv run mcpgt run liar-concurrent
@@ -205,6 +220,7 @@ constraint. Sequential calls look idempotent. Concurrent calls both insert.
 
 | Command | Purpose |
 |---|---|
+| `mcpgt demo` | Run a bundled example that shows a real violation, no setup needed. |
 | `mcpgt init <dir> [--name N] [--env K=V] [--force] [--no-sandbox] -- <server command>` | Start a server, list its tools, and write a starting `target.toml` with `TODO(mcpgt)` placeholders for everything only you can decide. |
 | `mcpgt verify-reset <fixture> [--json]` | Reset twice and confirm identical normalized state. |
 | `mcpgt run <fixture> [--tool NAME] [--runs N] [--concurrent-attempts N] [--runs-dir DIR]` | Run the test battery, write a JSON report, print a summary. |
@@ -338,7 +354,7 @@ expected verdicts; audit reports are measurements for review.
 | Linux | denied (`unshare --net`) | **not confined** | needs unprivileged user namespaces |
 | Linux without user namespaces | — | — | audits refuse to run; sandbox tests are skipped in CI | `targets/memory` pins the reference memory server
 from `modelcontextprotocol/servers`. See
-[docs/methodology.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/methodology.md#audit-targets).
+[docs/methodology.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/methodology.md#audit-targets).
 
 ```bash
 export PATH="/path/to/node-v24/bin:$PATH"   # the target pins Node 24
@@ -381,7 +397,7 @@ observation is INCONCLUSIVE, never PASS, and without a sandbox the run
 refuses to start. It runs on macOS and on Linux (with unprivileged user
 namespaces); both are tested end to end in CI. Details,
 configuration, guarantees and gaps:
-[docs/network.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/network.md).
+[docs/network.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/network.md).
 
 ---
 
@@ -417,7 +433,7 @@ as "tool twice, then probe" against "tool once, then probe". A probe whose
 output varies on its own decides nothing, and a change seen in some runs only
 is INCONCLUSIVE, not a VIOLATION. How it works, the cost in sessions, and
 what probes cannot see:
-[docs/probes.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/probes.md).
+[docs/probes.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/probes.md).
 
 ---
 
@@ -461,7 +477,7 @@ Encrypted egress is INCONCLUSIVE, never PASS. In the `data-lineage` fixture,
 every tool passes its own network test; three chains show the difference.
 How it works, the evidence grades, and what lineage cannot see (notably,
 values an AI client copies between calls):
-[docs/lineage.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/lineage.md).
+[docs/lineage.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/lineage.md).
 
 ---
 
@@ -473,8 +489,8 @@ about other servers or other versions of these.
 
 | Server | Tools (argument sets) | Violations | Over-declarations | Network attempts | Review |
 |---|---|---|---|---|---|
-| memory (`@modelcontextprotocol/server-memory` 1.0.0) | 9 (one each, and 12 for the three create/add tools) | none | 3: `create_entities`, `create_relations` and `add_observations` declare `idempotentHint: false`, but a repeated identical call changed nothing; [fixed upstream](https://github.com/modelcontextprotocol/servers/pull/5349) | none ([review](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/results/network-2026-10-25/REVIEW.md)) | [REVIEW.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/results/memory-2026-10-14/REVIEW.md) |
-| filesystem (`@modelcontextprotocol/server-filesystem` 1.0.0) | 14 (22) | none | 1: `move_file` declares `idempotentHint: false`; a repeat changes nothing but reports an error, so `false` is defensible | none ([review](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/results/network-2026-10-25/REVIEW.md)) | [REVIEW.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/results/filesystem-2026-10-14/REVIEW.md) |
+| memory (`@modelcontextprotocol/server-memory` 1.0.0) | 9 (one each, and 12 for the three create/add tools) | none | 3: `create_entities`, `create_relations` and `add_observations` declare `idempotentHint: false`, but a repeated identical call changed nothing; [fixed upstream](https://github.com/modelcontextprotocol/servers/pull/5349) | none ([review](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/results/network-2026-10-25/REVIEW.md)) | [REVIEW.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/results/memory-2026-10-14/REVIEW.md) |
+| filesystem (`@modelcontextprotocol/server-filesystem` 1.0.0) | 14 (22) | none | 1: `move_file` declares `idempotentHint: false`; a repeat changes nothing but reports an error, so `false` is defensible | none ([review](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/results/network-2026-10-25/REVIEW.md)) | [REVIEW.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/results/filesystem-2026-10-14/REVIEW.md) |
 
 ---
 
@@ -506,7 +522,7 @@ about other servers or other versions of these.
   unobserved children are not seen; unobserved children are reported as
   coverage gaps. A server written to evade it can, but it cannot evade the
   sandbox. See
-  [docs/network.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/network.md#known-gaps).
+  [docs/network.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/network.md#known-gaps).
 - **State in SQLite, files or JSON only.** Observation covers SQLite
   databases, files and directory trees, and JSON or JSON Lines files.
   State held anywhere else (process memory, another database, a remote
@@ -601,7 +617,7 @@ descriptions below follow each project's own documentation as checked on
   (0.4.0) build on the same idea, adding a clean reset per session, a noise
   check of each probe on its own, reproduction in every run, idempotence,
   and a cross-check against observed state
-  ([details](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/probes.md#prior-work)).
+  ([details](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/probes.md#prior-work)).
 - **Li, "Where Does Exactly-Once Live?"** [7] benchmarks duplicate side
   effects in LLM agents across model, agent harness and tool contract, in a
   deterministic sandbox of six services with injected faults, and measures
@@ -662,4 +678,4 @@ is discussed under [Related work](#related-work).
 
 ## License
 
-Apache License 2.0. See [LICENSE](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/LICENSE) and [NOTICE](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/NOTICE).
+Apache License 2.0. See [LICENSE](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/LICENSE) and [NOTICE](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/NOTICE).

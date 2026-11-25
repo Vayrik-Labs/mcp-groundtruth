@@ -6,6 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-25
+
+### Added
+
+- `mcpgt demo`: runs a bundled example (the `liar-concurrent` fixture, packaged
+  with the wheel) that shows a real VIOLATION, with no setup.
+  `uvx --from mcp-groundtruth mcpgt demo` is the whole first run.
+
+### Changed
+
+- The project moved to github.com/vayrik-labs/mcp-groundtruth; links in the
+  README, docs, changelog, package metadata and `mcpgt init` output point
+  there.
+- Package metadata names the author (Vayrik Labs) and the homepage.
+
 ## [0.5.0] - 2026-11-06
 
 Traces synthetic data across chains of tool calls: where a planted value
@@ -213,9 +228,10 @@ ground truth; does not test third-party servers.
 - Eleven ground-truth fixture servers and an end-to-end ground-truth test.
 - Methodology documentation.
 
-[Unreleased]: https://github.com/shreyasbhakta/mcp-groundtruth/compare/v0.5.0...HEAD
-[0.5.0]: https://github.com/shreyasbhakta/mcp-groundtruth/releases/tag/v0.5.0
-[0.4.0]: https://github.com/shreyasbhakta/mcp-groundtruth/releases/tag/v0.4.0
-[0.3.0]: https://github.com/shreyasbhakta/mcp-groundtruth/releases/tag/v0.3.0
-[0.2.0]: https://github.com/shreyasbhakta/mcp-groundtruth/releases/tag/v0.2.0
-[0.1.0]: https://github.com/shreyasbhakta/mcp-groundtruth/releases/tag/v0.1.0
+[Unreleased]: https://github.com/vayrik-labs/mcp-groundtruth/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.6.0
+[0.5.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.5.0
+[0.4.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.4.0
+[0.3.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.3.0
+[0.2.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.2.0
+[0.1.0]: https://github.com/vayrik-labs/mcp-groundtruth/releases/tag/v0.1.0

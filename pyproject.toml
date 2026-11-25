@@ -1,7 +1,8 @@
 [project]
 name = "mcp-groundtruth"
-version = "0.5.0"
+version = "0.6.0"
 description = "Behavioral conformance harness for Model Context Protocol tool annotations."
+authors = [{ name = "Vayrik Labs" }]
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
@@ -26,10 +27,11 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/shreyasbhakta/mcp-groundtruth"
-Methodology = "https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/methodology.md"
-Changelog = "https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/CHANGELOG.md"
-Issues = "https://github.com/shreyasbhakta/mcp-groundtruth/issues"
+Homepage = "https://vayriklabs.com"
+Repository = "https://github.com/vayrik-labs/mcp-groundtruth"
+Methodology = "https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/methodology.md"
+Changelog = "https://github.com/vayrik-labs/mcp-groundtruth/blob/main/CHANGELOG.md"
+Issues = "https://github.com/vayrik-labs/mcp-groundtruth/issues"
 
 [project.scripts]
 mcpgt = "mcpgt.cli:main"

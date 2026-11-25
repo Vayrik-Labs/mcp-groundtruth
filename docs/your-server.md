@@ -34,7 +34,7 @@ uvx --from mcp-groundtruth mcpgt --help   # or run it without installing
 also clone it and work from its root:
 
 ```bash
-git clone https://github.com/shreyasbhakta/mcp-groundtruth.git
+git clone https://github.com/vayrik-labs/mcp-groundtruth.git
 cd mcp-groundtruth
 ```
 
@@ -279,13 +279,13 @@ If your server keeps state in memory or anywhere the adapters can't observe,
 add a `[probes]` section naming a tool whose output shows that state, such
 as a list tool. The harness then also checks whether each read-only or
 idempotent tool changes what the probe returns. See
-[probes.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/probes.md).
+[probes.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/probes.md).
 
 ### Data that travels between tools
 
 To check whether sensitive data can leave through a sequence of tools, plant
 `{marker:NAME}` in a seed and list chains under `[[lineage.chains]]`. See
-[lineage.md](https://github.com/shreyasbhakta/mcp-groundtruth/blob/main/docs/lineage.md).
+[lineage.md](https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/lineage.md).
 
 ## 7. Gate releases in CI
 
@@ -300,7 +300,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: npm ci && npm run build   # build your server first: audits have no network
-      - uses: shreyasbhakta/mcp-groundtruth@<commit-sha>   # pin a commit or release tag
+      - uses: vayrik-labs/mcp-groundtruth@<commit-sha>   # pin a commit or release tag
         with:
           target: mcpgt/my-server      # the directory holding target.toml
 ```
