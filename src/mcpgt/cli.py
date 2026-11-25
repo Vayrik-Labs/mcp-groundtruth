@@ -1,9 +1,10 @@
-"""mcpgt command line: init, verify-reset, prepare, run, report."""
+"""mcpgt command line: demo, init, verify-reset, prepare, run, report."""
 
 from __future__ import annotations
 
 import argparse
 import asyncio
+import importlib.resources
 import json
 import sys
 import tempfile
@@ -20,6 +21,12 @@ from mcpgt.sources import prepare as prepare_source
 from mcpgt.verdict import CONCURRENT_ATTEMPTS, MIN_RUNS, Outcome, ResetStatus, derive
 
 EXIT_OK, EXIT_UNEXPECTED, EXIT_USAGE = 0, 1, 2
+DEMO = "liar-concurrent"  # bundled under mcpgt/demo/; kept identical to fixtures/liar-concurrent by a test
+DEMO_NOTE = """
+This server declares idempotentHint: true. Sequential calls agree; concurrent calls create duplicates. \
+That is a VIOLATION, reproduced with evidence.
+Test your own server: mcpgt init my-server -- <your server command>
+Guide: https://github.com/vayrik-labs/mcp-groundtruth/blob/main/docs/your-server.md"""
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -28,6 +35,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
+
+    sub.add_parser("demo", help="run a bundled example that shows a real violation, no setup needed")
 
     vr = sub.add_parser("verify-reset", help="reset twice and confirm identical normalized state")
     vr.add_argument("fixture", help="fixture name under fixtures/, or a path to a fixture directory")
@@ -103,6 +112,8 @@ def main(argv: list[str] | None = None) -> int:
         return _init(args, server_command)
     if args.command == "report":
         return _report(args)
+    if args.command == "demo":
+        return _demo()
     try:
         fx = fixtures.load(args.fixture)
     except fixtures.FixtureError as exc:
@@ -113,6 +124,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "prepare":
         return _prepare(fx)
     return _run(fx, args)
+
+
+def _demo() -> int:
+    """Copy the bundled fixture somewhere writable and run it with the run defaults."""
+    with tempfile.TemporaryDirectory(prefix="mcpgt-demo-") as tmp:
+        root = Path(tmp) / DEMO
+        root.mkdir()
+        for item in (importlib.resources.files("mcpgt") / "demo" / DEMO).iterdir():
+            if item.is_file():  # skips a __pycache__ directory, if any
+                (root / item.name).write_bytes(item.read_bytes())
+        defaults = argparse.Namespace(
+            runs=MIN_RUNS,
+            tool=None,
+            concurrent_attempts=CONCURRENT_ATTEMPTS,
+            observe_concurrent=False,
+            fail_on_violation=False,
+            audit=False,
+            runs_dir=Path(tmp) / "runs",
+        )
+        code = _run(fixtures.load(root), defaults)
+    print(DEMO_NOTE)
+    return code
 
 
 def _init(args: argparse.Namespace, server_command: list[str]) -> int:
